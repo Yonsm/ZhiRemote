@@ -13,7 +13,7 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.core import callback
 from base64 import b64decode
 
-REQUIREMENTS = ['broadlink>=0.11.1']
+REQUIREMENTS = ['broadlink>=0.16']
 
 _LOGGER = logging.getLogger(__name__)
 
