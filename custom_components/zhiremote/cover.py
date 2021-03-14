@@ -1,24 +1,16 @@
-import logging
-import binascii
-import socket
 import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 
-from homeassistant.components.cover import (CoverEntity, PLATFORM_SCHEMA, SUPPORT_OPEN, SUPPORT_CLOSE)
-from homeassistant.const import (CONF_NAME, CONF_HOST, CONF_MAC, CONF_TIMEOUT, STATE_OPEN, STATE_CLOSED)
+from homeassistant.components.cover import CoverEntity, PLATFORM_SCHEMA, SUPPORT_OPEN, SUPPORT_CLOSE
+from homeassistant.const import CONF_NAME, CONF_SENDER, STATE_CLOSED
 from homeassistant.helpers.event import track_utc_time_change
 from homeassistant.helpers.event import async_track_state_change
-from homeassistant.helpers.entity import async_generate_entity_id
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.util import slugify
 from homeassistant.core import callback
 from base64 import b64decode
 
-REQUIREMENTS = ['broadlink>=0.16']
-
-_LOGGER = logging.getLogger(__name__)
-
-DEFAULT_NAME = 'Broadlink'
-DEFAULT_TIMEOUT = 10
+DEFAULT_NAME = 'Remote'
 
 CONF_COMMAND_OPEN = 'command_open'
 CONF_COMMAND_CLOSE = 'command_close'
@@ -28,66 +20,41 @@ CONF_TRAVEL_TIME = 'travel_time'
 CONF_COVERS = 'covers'
 
 COVERS_SCHEMA = vol.Schema({
-    vol.Optional(CONF_COMMAND_STOP, default=None): cv.string,
-    vol.Optional(CONF_COMMAND_OPEN, default=None): cv.string,
-    vol.Optional(CONF_COMMAND_CLOSE, default=None): cv.string,
-    vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-    vol.Optional(CONF_TRAVEL_TIME, default=None): cv.positive_int,
-    #    vol.Optional(CONF_POS_SENSOR, default=None): cv.entity_id,
-    vol.Optional(CONF_POS_SENSOR,): cv.entity_id,
+    vol.Required(CONF_COMMAND_OPEN): cv.string,
+    vol.Required(CONF_COMMAND_CLOSE): cv.string,
+    vol.Optional(CONF_COMMAND_STOP): cv.string,
+    vol.Optional(CONF_TRAVEL_TIME, default=0): cv.positive_int,
+    vol.Optional(CONF_POS_SENSOR): cv.entity_id,
 })
 
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Optional(CONF_COVERS, default={}): vol.Schema({cv.slug: COVERS_SCHEMA}),
-    vol.Optional(CONF_TIMEOUT, default=DEFAULT_TIMEOUT): cv.positive_int,
-    vol.Required(CONF_HOST): cv.string,
-    vol.Required(CONF_MAC): cv.string,
+    vol.Optional(CONF_COVERS, default={}): vol.Schema({cv.string: COVERS_SCHEMA}),
+    vol.Required(CONF_SENDER): cv.string,
 })
 
 
 async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
-    import broadlink
-    devices = config.get(CONF_COVERS)
-    ip_addr = config.get(CONF_HOST)
-    mac_addr = binascii.unhexlify(config.get(CONF_MAC).encode().replace(b':', b''))
-    broadlink_device = broadlink.rm((ip_addr, 80), mac_addr, None)
-
-    covers = []
-    for object_id, device_config in devices.items():
-        covers.append(
-            RMCover(
-                hass,
-                object_id,
-                broadlink_device,
-                device_config.get(CONF_NAME, object_id),
-                device_config.get(CONF_COMMAND_OPEN),
-                device_config.get(CONF_COMMAND_CLOSE),
-                device_config.get(CONF_COMMAND_STOP),
-                device_config.get(CONF_TRAVEL_TIME),
-                device_config.get(CONF_POS_SENSOR),
-            )
-        )
-
-    broadlink_device.timeout = config.get(CONF_TIMEOUT)
-    try:
-        broadlink_device.auth()
-    except socket.timeout:
-        _LOGGER.error("Failed to connect to Broadlink RM Device")
-
-    async_add_devices(covers, True)
+    covers = config.get(CONF_COVERS)
+    sender = config.get(CONF_SENDER)
+    async_add_devices([RMCover(hass, sender, name, conf) for name, conf in covers.items()], True)
     return True
 
 
 class RMCover(CoverEntity, RestoreEntity):
     """Representation of a cover."""
 
-    def __init__(self, hass, entity_id, device, name, cmd_open, cmd_close, cmd_stop, travel_time, pos_entity_id):
+    def __init__(self, hass, sender, name, conf):
         """Initialize the cover."""
         self.hass = hass
-        self.entity_id = async_generate_entity_id(
-            'cover.{}', entity_id, hass=hass)
-        self._name = name or entity_id
+        self.sender = sender
+
+        self._name = name
+        self._cmd_open = conf[CONF_COMMAND_OPEN]
+        self._cmd_close = conf[CONF_COMMAND_CLOSE]
+        cmd_stop = conf.get(CONF_COMMAND_STOP)
+        travel_time = conf.get(CONF_TRAVEL_TIME)
+        pos_entity_id = conf.get(CONF_POS_SENSOR)
 
         if travel_time:
             self._position = 50
@@ -98,10 +65,8 @@ class RMCover(CoverEntity, RestoreEntity):
             self._position = None
             self._device_class = 'garage'
 
-        self._cmd_open = b64decode(cmd_open) if cmd_open else None
-        self._cmd_close = b64decode(cmd_close) if cmd_close else None
         if cmd_stop:
-            self._cmd_stop = b64decode(cmd_stop)
+            self._cmd_stop = cmd_stop
             self._supported_features = None
         else:
             self._position = None
@@ -112,7 +77,6 @@ class RMCover(CoverEntity, RestoreEntity):
         self._unsub_listener_cover = None
         self._is_opening = False
         self._is_closing = False
-        self._device = device
         self._travel = 0
         self._closed = False
         self._delay = False
@@ -133,11 +97,16 @@ class RMCover(CoverEntity, RestoreEntity):
             if self._position == 0:
                 self._position = 100
 
+    @callback
     async def _async_pos_changed(self, entity_id, old_state, new_state):
         if new_state is None:
             return
         self._async_update_pos(new_state)
         await self.async_update_ha_state()
+
+    @property
+    def unique_id(self):
+        return 'zhi.remote.' + slugify(self._name)
 
     @property
     def name(self):
@@ -182,12 +151,12 @@ class RMCover(CoverEntity, RestoreEntity):
         if self._position == 0:
             return
         elif self._position is None:
-            if self._sendpacket(self._cmd_close):
+            if self.send_command(self._cmd_close):
                 self._closed = True
                 self.schedule_update_ha_state()
             return
 
-        if self._sendpacket(self._cmd_close):
+        if self.send_command(self._cmd_close):
             self._travel = self._travel_time + 1
             self._is_closing = True
             self._listen_cover()
@@ -198,12 +167,12 @@ class RMCover(CoverEntity, RestoreEntity):
         if self._position == 100:
             return
         elif self._position is None:
-            if self._sendpacket(self._cmd_open):
+            if self.send_command(self._cmd_open):
                 self._closed = False
                 self.schedule_update_ha_state()
             return
 
-        if self._sendpacket(self._cmd_open):
+        if self.send_command(self._cmd_open):
             self._travel = self._travel_time + 1
             self._is_opening = True
             self._listen_cover()
@@ -227,20 +196,20 @@ class RMCover(CoverEntity, RestoreEntity):
                 self._travel = 1
             self._requested_closing = position < self._position
             if self._requested_closing:
-                if self._sendpacket(self._cmd_close):
+                if self.send_command(self._cmd_close):
                     self._listen_cover()
             else:
-                if self._sendpacket(self._cmd_open):
+                if self.send_command(self._cmd_open):
                     self._listen_cover()
 
     def stop_cover(self, **kwargs):
         self._is_closing = False
         self._is_opening = False
         if self._position is None:
-            self._sendpacket(self._cmd_stop)
+            self.send_command(self._cmd_stop)
             return
         elif self._position > 0 and self._position < 100:
-            self._sendpacket(self._cmd_stop)
+            self.send_command(self._cmd_stop)
 
         if self._unsub_listener_cover is not None:
             self._unsub_listener_cover()
@@ -276,29 +245,10 @@ class RMCover(CoverEntity, RestoreEntity):
 
             self.schedule_update_ha_state()
 
-    def _sendpacket(self, packet, retry=2):
-        if packet is None:
-            _LOGGER.debug("Empty packet")
-            return True
-        try:
-            self._device.send_data(packet)
-        except (socket.timeout, ValueError) as error:
-            if retry < 1:
-                _LOGGER.error(error)
-                return False
-            if not self._auth():
-                return False
-            return self._sendpacket(packet, retry-1)
+    def send_command(self, command):
+        data = {'entity_id': self.sender, 'command': command}
+        self.hass.services.call('remote', 'send_command', data)
         return True
-
-    def _auth(self, retry=2):
-        try:
-            auth = self._device.auth()
-        except socket.timeout:
-            auth = False
-        if not auth and retry > 0:
-            return self._auth(retry-1)
-        return auth
 
     async def async_added_to_hass(self):
         await super().async_added_to_hass()

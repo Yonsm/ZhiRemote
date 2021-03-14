@@ -3,7 +3,7 @@
 	"name": "Remote Control Device",
 	"documentation": "https://github.com/Yonsm/ZhiRemote",
 	"version": "1.0.1",
-	"requirements": ["broadlink>=0.16"],
-	"dependencies": [],
+	"requirements": [],
+	"dependencies": ["broadlink"],
 	"codeowners": ["@Yonsm"]
 }
