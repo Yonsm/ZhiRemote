@@ -6,9 +6,7 @@ from homeassistant.const import CONF_NAME, CONF_SENDER, STATE_CLOSED
 from homeassistant.helpers.event import track_utc_time_change
 from homeassistant.helpers.event import async_track_state_change
 from homeassistant.helpers.restore_state import RestoreEntity
-from homeassistant.util import slugify
 from homeassistant.core import callback
-from base64 import b64decode
 
 DEFAULT_NAME = 'Remote'
 
@@ -37,11 +35,11 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
     covers = config.get(CONF_COVERS)
     sender = config.get(CONF_SENDER)
-    async_add_devices([RMCover(hass, sender, name, conf) for name, conf in covers.items()], True)
+    async_add_devices([ZhiRemoteCover(hass, sender, name, conf) for name, conf in covers.items()], True)
     return True
 
 
-class RMCover(CoverEntity, RestoreEntity):
+class ZhiRemoteCover(CoverEntity, RestoreEntity):
     """Representation of a cover."""
 
     def __init__(self, hass, sender, name, conf):
@@ -106,7 +104,8 @@ class RMCover(CoverEntity, RestoreEntity):
 
     @property
     def unique_id(self):
-        return 'zhi.remote.' + slugify(self._name)
+        from homeassistant.util import slugify
+        return self.__class__.__name__.lower() + '.' + slugify(self.name)
 
     @property
     def name(self):
