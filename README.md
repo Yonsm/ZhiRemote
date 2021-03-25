@@ -8,28 +8,38 @@ Generic Remote Control Device for HomeAssistant
 
 把 `zhiremote` 放入 `custom_components`。
 
+_依赖 [Zhi](https://github.com/Yonsm/Zhi)，请一并安装。_
+
 ## 2. 配置方法
 
 参见 [我的 Home Assistant 配置](https://github.com/Yonsm/.homeassistant) 中 [configuration.yaml](https://github.com/Yonsm/.homeassistant/blob/main/configuration.yaml)
 
 ```yaml
+fan:
+  - platform: zhiremote
+    name: 客厅壁扇
+    sender: remote.ke_ting_yao_kong
+    command: midea_fan
+
+climate:
+  - platform: zhiremote
+    name: 书房空调
+    sender: remote.shu_fang_yao_kong
+    command: mitsubishi_climate
+    sensor: sensor.shu_fang_wen_du
+
 cover:
-  - platform: broadlink2
-    host: Remote
-    mac: 34:EA:34:58:73:5D
-    covers:
-      shu_fang_chuang_lian:
-        name: 书房窗帘
-        travel_time: 13
-        command_open: sgD8AJ8wGAwNFxgMGAwYDAwYFwwYDQwYGAsNFw0XDRcYDAwYDBgNFxkMDBgYDBgMDBcNFw0XGQsNFxgMGAwMGAwYDBgXDQwYDBcNFxgMDRcMGAwXGAABIZ4xGQwNFxgMGAwYDAwXGAwYDQwXGAwNFw0XDBgYDAwYDBgMGBgMDBcYDBgMDRcMGAwYGAwMGBgMGAwMFw0XDRcYDA0XDBgMGBgMDBkMFw0XGAABIZ4xFwwNFxgMGAwYDAwYGAwYDAwYGAwMFw0XDRcYDAwYDBgNFxgMDBgYDRgMDBgMFw0YGAsNFxgMGAwMGAwYDBcYDQwYDBcNFxgMDBgMGAwYFwAF3AAAAAAAAAAAAAAAAA==
-        command_stop: sgD8AJ4xGAwMGBcMGAwYDAwYGAwYDAwYGAwMGAwZDBcYDAwYDBkLGBgMDBgYDBcNDBgMFw0YFw0MFxgMGAwMGAwYDBgXDQwYFw0MFxgMDRcYDAwYFwABIZ8xGAwMGBcNFw0XDQwXGAwYDQwYFwwNFwwYDBgXDQwYDBgMGBcMDRcYDBgMDBgMGAwYGAwMGBcNFwwNFwwYDBgZDAwYFw0MGBcNDBcYDAwYGAABIJ4xGAwMGBgMGAwXDQwXGAwYDQwYFwwNFwwYDBgYDAwYDRgMGBcNDBcYDBgMDBgMGAwYGAwMGBcNFw0MGAsYDBgYDAwYGAwMGBcNDBcYDAwYGAAF3AAAAAAAAAAAAAAAAA==
-        command_close: sgD8AJ0xGAwMGBcNFw0XDQsYGAwYDAwZFwwMGAwYDBgXDQwXDBkMGBcNCxkXDBgMDBkMGAwYGAwMGBcNFw0MGAsZCxgYDQsYDBgXDRcNDBgMGBcNFwABIZ4xFw0MGBcNFwwYDA0YGAwYDAwYGAwMGAwYDBgXDQsYDBgMGBgMDBgXDRcNDBgMGAwYFw0MGBcMGAwMGAwYDBgXDQwYDBgXDRcMDBgMGBgMFwABI50yFw0LGBgMGAwXDQwYFw0XDQwYFw0MGAwYDBcYDAwYDBgMGBgMDBgXDRcNCxkLGAwYGA4MFxgMGAwMGAwYDBgXDQwYDBgXDBgNCxgMGBcNFwAF3AAAAAAAAAAAAAAAAA==
-      shu_fang_mu_bu:
-        name: 书房幕布
-        travel_time: 45
-        command_open: JgDGACoPKQ8pDykQDikOKg4qDykPKA4qKQ8PKQ8pKA8QKSgQKQ8pDw8pKBApDykPDykpDykPDykpDw8pKQ8PKQ8pKAAD0igQKBAoECgQDykPKQ8oDykPKQ8pKBAPKQ8oKRAPKCkQKBAoEA8oKBEoECgQDykoECgQDykoEA8pKBAPKA8pKQAD0SkPKRAoECgQDygQKA8pDykPKQ8oKRAPKA4qKQ8PKSkPKQ8pDw8pKQ8pDykQDygpECgQDikqDw8oKQ8PKQ8pKQANBQAA
-        command_stop: JgDGACoPKg8pDykPDygQKBEnDykQKBAnECgpDw8pKBAPKSgQKg4qDg8pECgqDikPDykQKA8pKBApDykPKQ8PKRAoDwAD6ioOKQ8pECkPDygQKA8pECgPKQ8oDykoEA8pKQ8PKSgQKQ8qDg8pECgoECoODykPKQ8oKRAoECkPKQ8PKQ8oEAAD6ikPKQ8qDikQDikPKQ8pDykPKBAoDykpDw8pKQ8PKSgQKQ8pDw8pDykoECkPDioPKQ8oKRAoECgQKBAPKQ8oEAANBQAA
-        command_close: JgDGACoPKRAoECgQDykPKBAoDykPKSgQDykPKA8pKQ8PKSkPKQ4qECgQDygpECgQKBAPKSgQKBAPKQ8oKRAPKA8pKQAD0SgQKQ8pDykPECgPKQ8pDykPKCkQDygPKQ8pKBAPKSgQKQ8pDykPDykoECkPKQ8PKSkOKg8PKQ8pKQwSKQ8pKAAD0igQKBAoECkPDykPKQ8oDykPKSkPDykPKQ8oKRAPKCkQKBAoECgQDykoECgQKA8QKSgQKQ8PKQ8pKBAPKBAoKQANBQAA
+  - platform: zhiremote
+    name: 书房窗帘
+    sender: remote.shu_fang_yao_kong
+    travel: 13
+    command: dooya_cover
+
+media_player:
+  - platform: zhiremote
+    name: 书房投影仪
+    sender: remote.shu_fang_yao_kong
+    command: viewsonic_projector
 ```
 
 ## 3. 参考
