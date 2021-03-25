@@ -5,8 +5,8 @@ from homeassistant.components.media_player.const import SUPPORT_TURN_OFF, SUPPOR
 from homeassistant.const import STATE_HOME, STATE_OFF, STATE_ON
 
 SUPPORT_FEATURES = {
-    'open': SUPPORT_TURN_ON,
-    'shut': SUPPORT_TURN_OFF,
+    'on': SUPPORT_TURN_ON,
+    'off': SUPPORT_TURN_OFF,
     'vol+': SUPPORT_VOLUME_STEP,
     'vol-': SUPPORT_VOLUME_STEP,
     'mute': SUPPORT_VOLUME_MUTE,
@@ -19,8 +19,8 @@ SUPPORT_FEATURES = {
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(ZHI_REMOTE_SCHEMA)
 
 
-async def async_setup_platform(hass, config, async_add_devices, discovery_info=None):
-    async_add_devices([ZhiRemoteMediaPlayer(config)])
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+    async_add_entities([ZhiRemoteMediaPlayer(config)])
 
 
 class ZhiRemoteMediaPlayer(ZhiRemoteEntity, MediaPlayerEntity, ZhiRestoreEntity):
@@ -45,11 +45,11 @@ class ZhiRemoteMediaPlayer(ZhiRemoteEntity, MediaPlayerEntity, ZhiRestoreEntity)
 
     async def async_turn_on(self):
         self._state = STATE_ON
-        await self.async_command('open')
+        await self.async_command('on')
 
     async def async_turn_off(self):
         self._state = STATE_OFF
-        await self.async_command('shut')
+        await self.async_command('off')
 
     async def async_volume_up(self):
         await self.async_command('vol+')
