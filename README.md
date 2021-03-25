@@ -2,7 +2,7 @@
 
 Generic Remote Control Device for HomeAssistant
 
-基于 Broadlink 万能遥控的通用设备，目前支持窗帘。
+基于 `remote` 遥控器的通用 `fan` `cover` `climate` `media_player` 组件。
 
 ## 1. 安装准备
 
