@@ -1,10 +1,7 @@
-from custom_components.zhiremote import ZHI_REMOTE_SCHEMA, ZhiRemoteEntity
-import voluptuous as vol
-import homeassistant.helpers.config_validation as cv
-
-from ..zhi.entity import ZhiEntity, ZHI_SCHEMA
 from ..zhi.cover import ZhiTravelCover, PLATFORM_SCHEMA
-from homeassistant.const import CONF_COMMAND, CONF_SENDER
+from ..zhiremote import ZHI_REMOTE_SCHEMA, ZhiRemoteEntity
+import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
 
 CONF_SENSOR = 'sensor'
 CONF_TRAVEL = 'travel'

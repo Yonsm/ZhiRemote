@@ -37,9 +37,9 @@ class ZhiRemoteEntity(ZhiEntity, ZhiRestoreEntity):
                 return
         if command[0] == '=':
             command = command[1:]
-            ops = command.split('-')
-            if len(ops) > 1:
-                return await self.send_command(*ops)
+        #     ops = command.split('-')
+        #     if len(ops) > 1:
+        #         return await self.send_command(*ops)
             command = last_dict[command]
         data = {'entity_id': self.sender}
         cmds = command.rsplit('_', 1)

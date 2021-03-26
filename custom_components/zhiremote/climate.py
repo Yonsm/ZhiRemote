@@ -36,7 +36,7 @@ class ZhiRemoteClimate(ZhiRemoteEntity, ClimateEntity):
         return self.hass.config.units.temperature_unit
 
     @property
-    def precision(self) -> float:
+    def precision(self):
         return PRECISION_WHOLE
 
     @property

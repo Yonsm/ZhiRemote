@@ -1,4 +1,3 @@
-
 from . import ZHI_REMOTE_SCHEMA, ZhiRemoteEntity
 from homeassistant.components.fan import FanEntity, PLATFORM_SCHEMA, SPEED_OFF, DIRECTION_REVERSE, DIRECTION_FORWARD, SUPPORT_SET_SPEED, SUPPORT_DIRECTION, SUPPORT_OSCILLATE
 from homeassistant.const import STATE_HOME, STATE_OFF, STATE_ON

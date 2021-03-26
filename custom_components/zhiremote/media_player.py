@@ -1,7 +1,6 @@
 from . import ZHI_REMOTE_SCHEMA, ZhiRemoteEntity
 from ..zhi.restore import ZhiRestoreEntity
-from homeassistant.components.media_player import MediaPlayerEntity, PLATFORM_SCHEMA
-from homeassistant.components.media_player.const import SUPPORT_TURN_OFF, SUPPORT_TURN_ON, SUPPORT_PREVIOUS_TRACK, SUPPORT_NEXT_TRACK, SUPPORT_VOLUME_STEP, SUPPORT_VOLUME_MUTE
+from homeassistant.components.media_player import MediaPlayerEntity, PLATFORM_SCHEMA, SUPPORT_TURN_OFF, SUPPORT_TURN_ON, SUPPORT_PREVIOUS_TRACK, SUPPORT_NEXT_TRACK, SUPPORT_VOLUME_STEP, SUPPORT_VOLUME_MUTE
 from homeassistant.const import STATE_HOME, STATE_OFF, STATE_ON
 
 SUPPORT_FEATURES = {
