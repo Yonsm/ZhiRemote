@@ -66,11 +66,11 @@ class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):
         self._mode = SPEED_OFF
         await self.async_command('off')
 
-    async def async_set_preset_mode(self, speed):
-        self._mode = speed
-        if speed != SPEED_OFF:
-            self._last_mode = speed
-        await self.async_command('preset_modes', speed)
+    async def async_set_preset_mode(self, preset_mode):
+        self._mode = preset_mode
+        if preset_mode != SPEED_OFF:
+            self._last_mode = preset_mode
+        await self.async_command('preset_modes', preset_mode)
 
     async def async_oscillate(self, oscillating):
         self._oscillating = oscillating
