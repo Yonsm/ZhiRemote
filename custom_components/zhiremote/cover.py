@@ -1,4 +1,5 @@
-from ..zhi.cover import ZhiTravelCover, PLATFORM_SCHEMA
+from ..zhi.cover import ZhiTravelCover
+from homeassistant.components.cover import PLATFORM_SCHEMA
 from ..zhiremote import ZHI_REMOTE_SCHEMA, ZhiRemoteEntity
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
