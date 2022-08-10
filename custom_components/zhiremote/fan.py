@@ -34,7 +34,7 @@ class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):
 
     @property
     def state(self):
-        return (STATE_ON, STATE_OFF)[self._mode == SPEED_OFF]
+        return STATE_OFF if self._mode == SPEED_OFF else STATE_ON
 
     @property
     def preset_modes(self):
@@ -52,13 +52,13 @@ class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):
     def current_direction(self):
         return self._direction
 
-    async def async_turn_on(self, speed, **kwargs):
+    async def async_turn_on(self, speed=None, percentage=None,  preset_mode=None, **kwargs):
         if 'on' in self.command:
             await self.send_command('on')
             from asyncio import sleep
             sleep(1)
         if 'preset_modes' in self.command:
-            return self.set_preset_mode(speed or self._last_mode or self.preset_modes[1])
+            return self.set_preset_mode(preset_mode or self._last_mode or self.preset_modes[1])
         self._mode = STATE_ON
         await self.async_update_ha_state()
 
