@@ -1,5 +1,5 @@
 from . import ZHI_REMOTE_SCHEMA, ZhiRemoteEntity
-from homeassistant.components.fan import FanEntity, PLATFORM_SCHEMA, SPEED_OFF, DIRECTION_REVERSE, DIRECTION_FORWARD, SUPPORT_PRESET_MODE, SUPPORT_DIRECTION, SUPPORT_OSCILLATE
+from homeassistant.components.fan import FanEntity, PLATFORM_SCHEMA, DIRECTION_REVERSE, DIRECTION_FORWARD, SUPPORT_PRESET_MODE, SUPPORT_DIRECTION, SUPPORT_OSCILLATE
 from homeassistant.const import STATE_HOME, STATE_OFF, STATE_ON
 
 
@@ -15,7 +15,7 @@ class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):
     def __init__(self, conf):
         super().__init__(conf)
 
-        self._mode = SPEED_OFF
+        self._mode = STATE_OFF
         self._last_mode = None
 
         self._direction = DIRECTION_FORWARD
@@ -34,7 +34,7 @@ class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):
 
     @property
     def state(self):
-        return STATE_OFF if self._mode == SPEED_OFF else STATE_ON
+        return STATE_OFF if self._mode == STATE_OFF else STATE_ON
 
     @property
     def preset_modes(self):
@@ -63,12 +63,12 @@ class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):
         await self.async_update_ha_state()
 
     async def async_turn_off(self):
-        self._mode = SPEED_OFF
+        self._mode = STATE_OFF
         await self.async_command('off')
 
     async def async_set_preset_mode(self, preset_mode):
         self._mode = preset_mode
-        if preset_mode != SPEED_OFF:
+        if preset_mode != STATE_OFF:
             self._last_mode = preset_mode
         await self.async_command('preset_modes', preset_mode)
 
@@ -88,4 +88,4 @@ class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):
         self._oscillating = attributes.get('oscillating', self._oscillating)
 
     def update_from_sensor(self, state):
-        self._mode = (self._last_mode or self.preset_modes[1] if 'preset_modes' in self.command else STATE_ON) if state.state in [STATE_ON, STATE_HOME] else SPEED_OFF
+        self._mode = (self._last_mode or self.preset_modes[1] if 'preset_modes' in self.command else STATE_ON) if state.state in [STATE_ON, STATE_HOME] else STATE_OFF
