@@ -6,8 +6,8 @@ from homeassistant.const import STATE_HOME, STATE_OFF, STATE_ON
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(ZHI_REMOTE_SCHEMA)
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    async_add_entities([ZhiRemoteFan(config)])
+async def async_setup_platform(hass, conf, async_add_entities, discovery_info=None):
+    async_add_entities([ZhiRemoteFan(conf)])
 
 
 class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):

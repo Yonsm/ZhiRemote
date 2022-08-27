@@ -11,8 +11,8 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(ZHI_REMOTE_SCHEMA)
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    async_add_entities([ZhiRemoteClimate(config)])
+async def async_setup_platform(hass, conf, async_add_entities, discovery_info=None):
+    async_add_entities([ZhiRemoteClimate(conf)])
 
 
 class ZhiRemoteClimate(ZhiRemoteEntity, ClimateEntity):
