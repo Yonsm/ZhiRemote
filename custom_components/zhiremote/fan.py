@@ -21,6 +21,8 @@ class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):
         self._direction = DIRECTION_FORWARD
         self._oscillating = False
 
+        self._attr_assumed_state = True
+
     @property
     def supported_features(self):
         features = 0
