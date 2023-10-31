@@ -113,8 +113,6 @@ class ZhiRemoteClimate(ZhiRemoteEntity, ClimateEntity):
         if self._hvac_mode.lower() == HVAC_MODE_OFF:
             if can_off:
                 await self.async_command('off')
-            else:
-                await self.async_update_ha_state()
             return
 
         if 'on' in self.command:

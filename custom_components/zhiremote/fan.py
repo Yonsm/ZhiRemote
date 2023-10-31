@@ -62,7 +62,7 @@ class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):
         if 'preset_modes' in self.command:
             return self.set_preset_mode(preset_mode or self._last_mode or self.preset_modes[1])
         self._mode = STATE_ON
-        await self.async_update_ha_state()
+        self.async_write_ha_state()
 
     async def async_turn_off(self):
         self._mode = STATE_OFF

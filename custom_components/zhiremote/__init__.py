@@ -53,4 +53,3 @@ class ZhiRemoteEntity(ZhiEntity, ZhiRestoreEntity):
 
     async def async_command(self, *ops):
         await self.send_command(*ops)
-        await self.async_update_ha_state()
