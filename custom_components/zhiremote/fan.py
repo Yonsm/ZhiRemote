@@ -1,13 +1,13 @@
 from . import ZHI_REMOTE_SCHEMA, ZhiRemoteEntity
-from homeassistant.components.fan import FanEntity, PLATFORM_SCHEMA, DIRECTION_REVERSE, DIRECTION_FORWARD, SUPPORT_PRESET_MODE, SUPPORT_DIRECTION, SUPPORT_OSCILLATE
+from homeassistant.components.fan import FanEntity, PLATFORM_SCHEMA, DIRECTION_REVERSE, DIRECTION_FORWARD, FanEntityFeature
 from homeassistant.const import STATE_HOME, STATE_OFF, STATE_ON
 
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(ZHI_REMOTE_SCHEMA)
 
 
-async def async_setup_platform(hass, conf, async_add_entities, discovery_info=None):
-    async_add_entities([ZhiRemoteFan(conf)])
+def setup_platform(hass, conf, add_entities, discovery_info=None):
+    add_entities([ZhiRemoteFan(conf)])
 
 
 class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):
@@ -27,11 +27,11 @@ class ZhiRemoteFan(ZhiRemoteEntity, FanEntity):
     def supported_features(self):
         features = 0
         if 'preset_modes' in self.command:
-            features = SUPPORT_PRESET_MODE
+            features = FanEntityFeature.PRESET_MODE
         if DIRECTION_REVERSE in self.command and DIRECTION_FORWARD in self.command:
-            features |= SUPPORT_DIRECTION
+            features |= FanEntityFeature.DIRECTION
         if 'oscillate' in self.command:
-            features |= SUPPORT_OSCILLATE
+            features |= FanEntityFeature.OSCILLATE
         return features
 
     @property

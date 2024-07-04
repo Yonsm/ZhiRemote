@@ -1,25 +1,25 @@
 from . import ZHI_REMOTE_SCHEMA, ZhiRemoteEntity
 from ..zhi.restore import ZhiRestoreEntity
-from homeassistant.components.media_player import MediaPlayerEntity, PLATFORM_SCHEMA, SUPPORT_TURN_OFF, SUPPORT_TURN_ON, SUPPORT_PREVIOUS_TRACK, SUPPORT_NEXT_TRACK, SUPPORT_VOLUME_STEP, SUPPORT_VOLUME_MUTE
+from homeassistant.components.media_player import MediaPlayerEntity, PLATFORM_SCHEMA, MediaPlayerEntityFeature
 from homeassistant.const import STATE_HOME, STATE_OFF, STATE_ON
 
-SUPPORT_FEATURES = {
-    'on': SUPPORT_TURN_ON,
-    'off': SUPPORT_TURN_OFF,
-    'vol+': SUPPORT_VOLUME_STEP,
-    'vol-': SUPPORT_VOLUME_STEP,
-    'mute': SUPPORT_VOLUME_MUTE,
-    'prev': SUPPORT_PREVIOUS_TRACK,
-    'next': SUPPORT_NEXT_TRACK,
-    # 'sources': SUPPORT_SELECT_SOURCE,
+MediaPlayerEntityFeature.FEATURES = {
+    'on': MediaPlayerEntityFeature.TURN_ON,
+    'off': MediaPlayerEntityFeature.TURN_OFF,
+    'vol+': MediaPlayerEntityFeature.VOLUME_STEP,
+    'vol-': MediaPlayerEntityFeature.VOLUME_STEP,
+    'mute': MediaPlayerEntityFeature.VOLUME_MUTE,
+    'prev': MediaPlayerEntityFeature.PREVIOUS_TRACK,
+    'next': MediaPlayerEntityFeature.NEXT_TRACK,
+    # 'sources': MediaPlayerEntityFeature.SELECT_SOURCE,
 }
 
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(ZHI_REMOTE_SCHEMA)
 
 
-async def async_setup_platform(hass, conf, async_add_entities, discovery_info=None):
-    async_add_entities([ZhiRemoteMediaPlayer(conf)])
+def setup_platform(hass, conf, add_entities, discovery_info=None):
+    add_entities([ZhiRemoteMediaPlayer(conf)])
 
 
 class ZhiRemoteMediaPlayer(ZhiRemoteEntity, MediaPlayerEntity, ZhiRestoreEntity):
@@ -39,7 +39,7 @@ class ZhiRemoteMediaPlayer(ZhiRemoteEntity, MediaPlayerEntity, ZhiRestoreEntity)
     def supported_features(self):
         features = 0
         for op in self.command:
-            features |= SUPPORT_FEATURES[op]
+            features |= MediaPlayerEntityFeature.FEATURES[op]
         return features
 
     async def async_turn_on(self):

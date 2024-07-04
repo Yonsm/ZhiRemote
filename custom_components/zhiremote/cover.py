@@ -11,8 +11,8 @@ CONF_TRAVEL = 'travel'
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(ZHI_REMOTE_SCHEMA | {vol.Optional(CONF_TRAVEL): cv.positive_int})
 
 
-async def async_setup_platform(hass, conf, async_add_entities, discovery_info=None):
-    async_add_entities([ZhiRemoteCover(conf)])
+def setup_platform(hass, conf, add_entities, discovery_info=None):
+    add_entities([ZhiRemoteCover(conf)])
 
 
 class ZhiRemoteCover(ZhiRemoteEntity, ZhiTravelCover):
